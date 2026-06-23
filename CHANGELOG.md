@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/esqobar/golang_social/compare/v1.0.0...v1.1.0) (2026-06-23)
+
+
+### Features
+
+* update api version automatically ([9975e92](https://github.com/esqobar/golang_social/commit/9975e929c985a45650bcd54dd07b48524dc7e03d))
+
 ## 1.0.0 (2026-06-23)
 
 
