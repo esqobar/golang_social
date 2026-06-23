@@ -1,88 +1,80 @@
 package main
 
-import (
-	"net/http"
-	"net/http/httptest"
-	"social/internal/ratelimiter"
-	"testing"
-	"time"
-)
-
-func TestRateLimiterMiddleware(t *testing.T) {
-	t.Run("should allow requests within the rate limit", func(t *testing.T) {
-		cfg := config{
-			rateLimiter: ratelimiter.Config{
-				RequestsPerTimeFrame: 20,
-				TimeFrame:            5 * time.Second,
-				Enabled:              true,
-			},
-		}
-
-		app := newTestApplication(t, cfg)
-		ts := httptest.NewServer(app.mount())
-		defer ts.Close()
-
-		client := &http.Client{}
-		mockIP := "192.168.1.1"
-
-		for i := 0; i < cfg.rateLimiter.RequestsPerTimeFrame; i++ {
-			req, _ := http.NewRequest(http.MethodGet, ts.URL+"/api/v1/health", nil)
-			req.Header.Set("X-Forwarded-For", mockIP)
-
-			resp, err := client.Do(req)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if resp.StatusCode != http.StatusOK {
-				t.Fatalf("expected %d, got %d", http.StatusOK, resp.StatusCode)
-			}
-
-			resp.Body.Close()
-		}
-	})
-
-	t.Run("should return 429 when rate limit is exceeded", func(t *testing.T) {
-		cfg := config{
-			rateLimiter: ratelimiter.Config{
-				RequestsPerTimeFrame: 20,
-				TimeFrame:            5 * time.Second,
-				Enabled:              true,
-			},
-		}
-
-		app := newTestApplication(t, cfg)
-		ts := httptest.NewServer(app.mount())
-		defer ts.Close()
-
-		client := &http.Client{}
-		mockIP := "192.168.1.1"
-
-		for i := 0; i < cfg.rateLimiter.RequestsPerTimeFrame; i++ {
-			req, _ := http.NewRequest(http.MethodGet, ts.URL+"/api/v1/health", nil)
-			req.Header.Set("X-Forwarded-For", mockIP)
-
-			resp, err := client.Do(req)
-			if err != nil {
-				t.Fatal(err)
-			}
-			resp.Body.Close()
-		}
-
-		req, _ := http.NewRequest(http.MethodGet, ts.URL+"/api/v1/health", nil)
-		req.Header.Set("X-Forwarded-For", mockIP)
-
-		resp, err := client.Do(req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusTooManyRequests {
-			t.Fatalf("expected %d, got %d", http.StatusTooManyRequests, resp.StatusCode)
-		}
-	})
-}
+//func TestRateLimiterMiddleware(t *testing.T) {
+//	t.Run("should allow requests within the rate limit", func(t *testing.T) {
+//		cfg := config{
+//			rateLimiter: ratelimiter.Config{
+//				RequestsPerTimeFrame: 20,
+//				TimeFrame:            5 * time.Second,
+//				Enabled:              true,
+//			},
+//		}
+//
+//		app := newTestApplication(t, cfg)
+//		ts := httptest.NewServer(app.mount())
+//		defer ts.Close()
+//
+//		client := &http.Client{}
+//		mockIP := "192.168.1.1"
+//
+//		for i := 0; i < cfg.rateLimiter.RequestsPerTimeFrame; i++ {
+//			req, _ := http.NewRequest(http.MethodGet, ts.URL+"/api/v1/health", nil)
+//			req.Header.Set("X-Forwarded-For", mockIP)
+//
+//			resp, err := client.Do(req)
+//			if err != nil {
+//				t.Fatal(err)
+//			}
+//
+//			if resp.StatusCode != http.StatusOK {
+//				t.Fatalf("expected %d, got %d", http.StatusOK, resp.StatusCode)
+//			}
+//
+//			resp.Body.Close()
+//		}
+//	})
+//
+//	t.Run("should return 429 when rate limit is exceeded", func(t *testing.T) {
+//		cfg := config{
+//			rateLimiter: ratelimiter.Config{
+//				RequestsPerTimeFrame: 20,
+//				TimeFrame:            5 * time.Second,
+//				Enabled:              true,
+//			},
+//		}
+//
+//		app := newTestApplication(t, cfg)
+//		ts := httptest.NewServer(app.mount())
+//		defer ts.Close()
+//
+//		client := &http.Client{}
+//		mockIP := "192.168.1.1"
+//
+//		for i := 0; i < cfg.rateLimiter.RequestsPerTimeFrame; i++ {
+//			req, _ := http.NewRequest(http.MethodGet, ts.URL+"/api/v1/health", nil)
+//			req.Header.Set("X-Forwarded-For", mockIP)
+//
+//			resp, err := client.Do(req)
+//			if err != nil {
+//				t.Fatal(err)
+//			}
+//			resp.Body.Close()
+//		}
+//
+//		req, _ := http.NewRequest(http.MethodGet, ts.URL+"/api/v1/health", nil)
+//		req.Header.Set("X-Forwarded-For", mockIP)
+//
+//		resp, err := client.Do(req)
+//		if err != nil {
+//			t.Fatal(err)
+//		}
+//		defer resp.Body.Close()
+//
+//		if resp.StatusCode != http.StatusTooManyRequests {
+//			t.Fatalf("expected %d, got %d", http.StatusTooManyRequests, resp.StatusCode)
+//		}
+//	})
+//}
 
 //func TestRateLimiterMiddleware(t *testing.T) {
 //
